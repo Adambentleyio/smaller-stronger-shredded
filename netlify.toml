@@ -9,7 +9,5 @@
   publish = "dist"
 
 [build.environment]
-  # Force Netlify to use a modern Node version
-  NODE_VERSION = "20"
   # Let Netlify know we are using pnpm so it hooks into your workspace cache
   PNPM_FLAGS = "--no-frozen-lockfile"
