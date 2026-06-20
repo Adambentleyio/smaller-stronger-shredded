@@ -1,0 +1,17 @@
+# Node dependencies
+**/node_modules/
+.pnpm-store/
+
+# Build outputs
+**/dist/
+**/.astro/
+
+# Environment secrets & local configurations
+**/.env
+**/.env.*
+**/@types/env.d.ts
+**/.sanity/
+
+# OS cache files
+.DS_Store
+Thumbs.db
