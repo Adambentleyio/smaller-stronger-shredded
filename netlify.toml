@@ -1,0 +1,15 @@
+[build]
+  # Tell Netlify to look inside the frontend directory for the Astro project
+  base = "frontend"
+  
+  # Execute the build command from that context
+  command = "pnpm build"
+  
+  # Point to Astro's default static build output directory
+  publish = "dist"
+
+[build.environment]
+  # Force Netlify to use a modern Node version
+  NODE_VERSION = "20"
+  # Let Netlify know we are using pnpm so it hooks into your workspace cache
+  PNPM_FLAGS = "--no-frozen-lockfile"

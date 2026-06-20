@@ -1,0 +1,85 @@
+---
+import { sanityClient } from "sanity:client";
+import { PortableText } from "astro-portabletext";
+import KnowledgeBomb from '../../components/KnowledgeBomb.astro'
+
+// 1. Tell Astro which paths to generate based on your Sanity entries
+export async function getStaticPaths() {
+  const logs = await sanityClient.fetch(`*[_type == "dailyLog"]{ "slug": slug.current }`);
+  
+  return logs.map((log) => ({
+    params: { slug: log.slug },
+  }));
+}
+
+// 2. Fetch the complete data for the active log page
+const { slug } = Astro.params;
+
+const logQuery = `*[_type == "dailyLog" && slug.current == $slug][0]{
+  date,
+  weight,
+  calories,
+  vibe,
+  content
+}`;
+
+const log = await sanityClient.fetch(logQuery, { slug });
+
+if (!log) {
+  return Astro.redirect("/404");
+}
+
+// 3. Create a custom component wrapper for the Knowledge Bomb block
+const portableTextComponents = {
+  type: {
+    knowledgeBomb: KnowledgeBomb
+  }
+};
+---
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Day ${log.date} | Smaller Stronger Shredded</title>
+</head>
+<body style="background: #fafafa; color: #222; font-family: system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2rem 1rem;">
+  
+  <main style="max-width: 650px; margin: 0 auto; background: #fff; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+    
+    <a href="/" style="color: #ff4500; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back Home</a>
+    
+    <header style="margin-top: 1.5rem; margin-bottom: 2.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 1.5rem;">
+      <h1 style="margin: 0 0 0.5rem 0; font-size: 2.5rem; letter-spacing: -0.02em;">Daily Log: {log.date}</h1>
+      <p style="margin: 0; color: #666; font-style: italic;">Smaller Stronger Shredded Experiment</p>
+    </header>
+
+    <!-- Metrics Dashboard Row -->
+    <section style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 3rem;">
+      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
+        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Weight</span>
+        <strong style="font-size: 1.4rem; color: #111;">{log.weight ? `${log.weight} kg` : '—'}</strong>
+      </div>
+      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
+        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Nutrition</span>
+        <strong style="font-size: 1.4rem; color: #111;">{log.calories ? `${log.calories} kcal` : '—'}</strong>
+      </div>
+      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
+        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Vibe Score</span>
+        <strong style="font-size: 1.4rem; color: #ff4500;">{log.vibe ? `${log.vibe}/10` : '—'}</strong>
+      </div>
+    </section>
+
+    <!-- Journal Content Area -->
+    <article style="font-size: 1.15rem; color: #333;">
+      {log.content ? (
+        <PortableText value={log.content} components={portableTextComponents} />
+      ) : (
+        <p style="color: #999; font-style: italic;">No thoughts logged for this day.</p>
+      )}
+    </article>
+
+  </main>
+
+</body>
+</html>

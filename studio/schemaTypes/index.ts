@@ -1,1 +1,4 @@
-export const schemaTypes = []
+
+import { dailyLog } from './dailyLog'
+
+export const schemaTypes = [dailyLog]
