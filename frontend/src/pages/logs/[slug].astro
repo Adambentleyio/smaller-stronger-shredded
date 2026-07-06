@@ -1,7 +1,9 @@
 ---
 import { sanityClient } from '../../lib/sanity';
+// import createClient from "@sanity/client"
 import { PortableText } from "astro-portabletext";
 import KnowledgeBomb from '../../components/KnowledgeBomb.astro';
+import { SanityClient } from "@sanity/client";
 
 export async function getStaticPaths() {
   const logs = await sanityClient.fetch(`*[_type == "dailyLog"]{ "slug": slug.current }`);
@@ -71,7 +73,7 @@ const formattedDate = new Date(log.date).toLocaleDateString('en-GB', {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.15em;
-      color: #555;
+      color: #9f9f9f;
     }
 
     .page-banner .entry-label {
@@ -116,14 +118,14 @@ const formattedDate = new Date(log.date).toLocaleDateString('en-GB', {
       font-family: 'Courier New', monospace;
       font-size: 0.75rem;
       letter-spacing: 0.08em;
-      color: #444;
+      color: #9f9f9f;
     }
 
     .experiment-tag {
       font-family: 'Courier New', monospace;
       font-size: 0.7rem;
       letter-spacing: 0.08em;
-      color: #333;
+      color: #9f9f9f;
       border: 1px solid #222;
       padding: 0.2em 0.6em;
       border-radius: 2px;
@@ -164,8 +166,9 @@ const formattedDate = new Date(log.date).toLocaleDateString('en-GB', {
       font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: #444;
+      color: #fff;
       display: block;
+      font-weight: 800;
       margin-bottom: 0.5rem;
       white-space: nowrap;
     }
