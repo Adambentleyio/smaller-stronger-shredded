@@ -1,3 +1,7 @@
 packages:
-  - 'frontend'
-  - 'studio'
+  - frontend
+  - studio
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

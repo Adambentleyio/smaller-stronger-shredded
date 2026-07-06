@@ -1,26 +1,26 @@
 ---
-import { sanityClient } from "sanity:client";
+import { sanityClient } from '../../lib/sanity';
 import { PortableText } from "astro-portabletext";
-import KnowledgeBomb from '../../components/KnowledgeBomb.astro'
+import KnowledgeBomb from '../../components/KnowledgeBomb.astro';
 
-// 1. Tell Astro which paths to generate based on your Sanity entries
 export async function getStaticPaths() {
   const logs = await sanityClient.fetch(`*[_type == "dailyLog"]{ "slug": slug.current }`);
-  
   return logs.map((log) => ({
     params: { slug: log.slug },
   }));
 }
 
-// 2. Fetch the complete data for the active log page
 const { slug } = Astro.params;
 
 const logQuery = `*[_type == "dailyLog" && slug.current == $slug][0]{
+  dayNumber,
+  title,
   date,
   weight,
   calories,
   vibe,
-  content
+  content,
+  "experimentTitle": experiment->title
 }`;
 
 const log = await sanityClient.fetch(logQuery, { slug });
@@ -29,57 +29,272 @@ if (!log) {
   return Astro.redirect("/404");
 }
 
-// 3. Create a custom component wrapper for the Knowledge Bomb block
 const portableTextComponents = {
-  type: {
-    knowledgeBomb: KnowledgeBomb
-  }
+  type: { knowledgeBomb: KnowledgeBomb }
 };
+
+const formattedDate = new Date(log.date).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
 ---
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>Day ${log.date} | Smaller Stronger Shredded</title>
+  <title>Day {log.dayNumber}: {log.title} | Smaller Stronger Shredded</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'Georgia', serif;
+      line-height: 1.7;
+    }
+
+    /* — Page banner above main — */
+    .page-banner {
+      background: #0d0d0d;
+      border-bottom: 1px solid #1f1f1f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .page-banner .site-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #555;
+    }
+
+    .page-banner .entry-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #ff4500;
+    }
+
+    /* — Layout — */
+    .wrapper {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* — Header — */
+    .entry-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid #1f1f1f;
+    }
+
+    .entry-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .day-number {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ff4500;
+    }
+
+    .entry-date {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: #444;
+    }
+
+    .experiment-tag {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: #333;
+      border: 1px solid #222;
+      padding: 0.2em 0.6em;
+      border-radius: 2px;
+      margin-left: auto;
+    }
+
+    .entry-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    /* — Stats — */
+    .stats {
+      display: flex;
+      gap: 0;
+      margin-bottom: 3.5rem;
+      border: 1px solid #1f1f1f;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .stat {
+      flex: 1 1 0;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .stat + .stat {
+      border-left: 1px solid #1f1f1f;
+    }
+
+    .stat-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #444;
+      display: block;
+      margin-bottom: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      display: block;
+      white-space: nowrap;
+    }
+
+    .stat-value.accent {
+      color: #ff4500;
+    }
+
+    .stat-empty {
+      color: #333;
+    }
+
+    /* — Body copy — */
+    .entry-body {
+      font-size: 1.1rem;
+      color: #ccc;
+    }
+
+    .entry-body p {
+      margin-bottom: 1.5rem;
+    }
+
+    .entry-body h2 {
+      font-size: 1.3rem;
+      color: #fff;
+      margin: 2.5rem 0 1rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .entry-body strong { color: #fff; }
+
+    .entry-body a {
+      color: #ff4500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .empty-note {
+      font-style: italic;
+      color: #333;
+    }
+
+    /* — Footer nav — */
+    .entry-footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid #1f1f1f;
+    }
+
+    .back-link {
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ff4500;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
 </head>
-<body style="background: #fafafa; color: #222; font-family: system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2rem 1rem;">
-  
-  <main style="max-width: 650px; margin: 0 auto; background: #fff; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-    
-    <a href="/" style="color: #ff4500; text-decoration: none; font-weight: bold; font-size: 0.9rem;">← Back Home</a>
-    
-    <header style="margin-top: 1.5rem; margin-bottom: 2.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 1.5rem;">
-      <h1 style="margin: 0 0 0.5rem 0; font-size: 2.5rem; letter-spacing: -0.02em;">Daily Log: {log.date}</h1>
-      <p style="margin: 0; color: #666; font-style: italic;">Smaller Stronger Shredded Experiment</p>
+<body>
+
+  <div class="page-banner">
+    <span class="site-label">Smaller Stronger Shredded</span>
+    <span class="entry-label">Day {log.dayNumber}</span>
+  </div>
+
+  <div class="wrapper">
+
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="day-number">Day {log.dayNumber}</span>
+        <span class="entry-date">{formattedDate}</span>
+        {log.experimentTitle && (
+          <span class="experiment-tag">{log.experimentTitle}</span>
+        )}
+      </div>
+      <h1 class="entry-title">{log.title}</h1>
     </header>
 
-    <!-- Metrics Dashboard Row -->
-    <section style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 3rem;">
-      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
-        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Weight</span>
-        <strong style="font-size: 1.4rem; color: #111;">{log.weight ? `${log.weight} kg` : '—'}</strong>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Weight</span>
+        {log.weight
+          ? <span class="stat-value">{log.weight}<small style="font-size:0.9rem;color:#555;"> kg</small></span>
+          : <span class="stat-value stat-empty">—</span>
+        }
       </div>
-      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
-        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Nutrition</span>
-        <strong style="font-size: 1.4rem; color: #111;">{log.calories ? `${log.calories} kcal` : '—'}</strong>
+      <div class="stat">
+        <span class="stat-label">Calories</span>
+        {log.calories
+          ? <span class="stat-value">{log.calories}<small style="font-size:0.9rem;color:#555;"> kcal</small></span>
+          : <span class="stat-value stat-empty">—</span>
+        }
       </div>
-      <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; border: 1px solid #eaeaea;">
-        <span style="font-size: 0.85rem; text-transform: uppercase; color: #666; font-weight: 600; display: block; margin-bottom: 0.25rem;">Vibe Score</span>
-        <strong style="font-size: 1.4rem; color: #ff4500;">{log.vibe ? `${log.vibe}/10` : '—'}</strong>
+      <div class="stat">
+        <span class="stat-label">Vibe</span>
+        {log.vibe
+          ? <span class="stat-value accent">{log.vibe}<small style="font-size:0.9rem;color:#555;">/10</small></span>
+          : <span class="stat-value stat-empty">—</span>
+        }
       </div>
-    </section>
+    </div>
 
-    <!-- Journal Content Area -->
-    <article style="font-size: 1.15rem; color: #333;">
-      {log.content ? (
-        <PortableText value={log.content} components={portableTextComponents} />
-      ) : (
-        <p style="color: #999; font-style: italic;">No thoughts logged for this day.</p>
-      )}
+    <article class="entry-body">
+      {log.content
+        ? <PortableText value={log.content} components={portableTextComponents} />
+        : <p class="empty-note">No thoughts logged for this day.</p>
+      }
     </article>
 
-  </main>
+    <footer class="entry-footer">
+      <a href="/logs" class="back-link">← Back to timeline</a>
+    </footer>
+
+  </div>
 
 </body>
 </html>

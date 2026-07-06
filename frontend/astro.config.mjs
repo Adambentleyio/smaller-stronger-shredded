@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 
 // Explicitly load the local .env file if it's missing during monorepo execution
 dotenv.config({ path: './.env' });
+console.log('PROJECT_ID:', process.env.PUBLIC_SANITY_PROJECT_ID);
+console.log('DATASET:', process.env.PUBLIC_SANITY_DATASET);
 
 export default defineConfig({
   integrations: [

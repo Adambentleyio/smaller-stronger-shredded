@@ -1,72 +1,52 @@
-import { defineType, defineField, defineArrayMember } from 'sanity'
-
-export const dailyLog = defineType({
+export default {
   name: 'dailyLog',
   title: 'Daily Log',
   type: 'document',
   fields: [
-    defineField({
+    {
+      name: 'dayNumber',
+      title: 'Day Number',
+      type: 'number',
+      description: 'e.g., 1, 14, 45',
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'title',
+      title: 'Log Title',
+      type: 'string',
+      description: 'The main headline for today\'s entry',
+      validation: Rule => Rule.required()
+    },
+    {
       name: 'date',
       title: 'Date',
       type: 'date',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
+      validation: Rule => Rule.required()
+    },
+    {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      options: {
-        source: 'date',
-        slugify: (input) => `day-${input}`,
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'weight',
-      title: 'Body Weight (kg)',
-      type: 'number',
-    }),
-    defineField({
-      name: 'calories',
-      title: 'Calorie Intake (kcal)',
-      type: 'number',
-    }),
-    defineField({
-      name: 'vibe',
-      title: 'Vibe / Satisfaction Slider',
-      description: 'Rate the day from 1 (rough) to 10 (unstoppable)',
-      type: 'number',
-      options: {
-        list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        layout: 'radio', // Renders as a clickable list or buttons in Sanity Studio
-      },
-      validation: (Rule) => Rule.min(1).max(10),
-    }),
-    defineField({
+      options: { 
+        // Generates clean slugs like 'day-45-squat-pr'
+        source: (doc) => `day-${doc.dayNumber}-${doc.title.toLowerCase().replace(/\s+/g, '-')}` 
+      }
+    },
+    {
+      name: 'experiment',
+      title: 'Relates to Experiment Phase',
+      type: 'reference',
+      to: [{ type: 'experiment' }],
+      validation: Rule => Rule.required()
+    },
+    { name: 'weight', title: 'Weight (kg)', type: 'number' },
+    { name: 'calories', title: 'Calories (kcal)', type: 'number' },
+    { name: 'vibe', title: 'Vibe Score (1-10)', type: 'number' },
+    {
       name: 'content',
-      title: 'Log Entry Content',
+      title: 'Journal & Entry Body',
       type: 'array',
-      of: [
-        // Standard Rich Text paragraph styles
-        defineArrayMember({ 
-          type: 'block' 
-        }),
-        // Custom "Knowledge Bomb" object block inside the content stream
-        defineArrayMember({
-          type: 'object',
-          name: 'knowledgeBomb',
-          title: 'Knowledge Bomb',
-          fields: [
-            defineField({
-              name: 'text',
-              title: 'The Takeaway',
-              type: 'text',
-              rows: 3,
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
-        }),
-      ],
-    }),
-  ],
-})
+      of: [{ type: 'block' }, { type: 'image' }, { type: 'knowledgeBomb' }]
+    }
+  ]
+};
