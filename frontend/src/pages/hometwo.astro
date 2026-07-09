@@ -1,0 +1,393 @@
+---
+import { createClient } from '@sanity/client';
+
+const sanityClient = createClient({
+  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
+  dataset: import.meta.env.PUBLIC_SANITY_DATASET,
+  apiVersion: '2024-03-15',
+  useCdn: false,
+});
+
+const query = `*[_type == "dailyLog"] | order(date desc) {
+  _id,
+  "slug": slug.current,
+  date,
+  dayNumber,
+  title,
+  weight,
+  calories,
+  vibe,
+  content
+}`;
+
+const logs = await sanityClient.fetch(query)
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smaller, Stronger, Shredded</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100;0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,700&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0D0E09;
+      --surface: #161810;
+      --text: #EDE9E0;
+      --text-muted: #5E6355;
+      --text-mid: #9A9E8C;
+      --accent: #B89028;
+      --accent-dim: rgba(184, 144, 40, 0.1);
+      --green-glow: rgba(38, 62, 24, 0.22);
+      --border: #222419;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 75% 35%, var(--green-glow) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 15% 85%, rgba(184,144,40,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 14, 9, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      user-select: none;
+    }
+    .wordmark sup {
+      color: var(--accent);
+      font-size: 0.75em;
+      vertical-align: super;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.18s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-links .nav-cta {
+      color: var(--accent);
+      border: 1px solid rgba(184,144,40,0.4);
+      padding: 0.38rem 1.1rem;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+      transition: background 0.18s, color 0.18s;
+    }
+    .nav-links .nav-cta:hover {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 0 2.5rem;
+      padding-top: 58px;
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 1rem 0 2.8rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 2.2rem;
+      height: 1px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── TITLE STACK ── */
+    .title-stack {
+      display: flex;
+      flex-direction: column;
+      line-height: 0.88;
+      margin-bottom: 3.2rem;
+      user-select: none;
+    }
+
+    .word {
+      font-family: 'Fraunces', serif;
+      display: block;
+    }
+
+    .word-smaller {
+      font-size: clamp(2rem, 7.5vw, 7.5rem);
+      color: var(--text-muted);
+      letter-spacing: 0.07em;
+      font-variation-settings: 'opsz' 144, 'wght' 100;
+    }
+
+    .word-stronger {
+      font-size: clamp(4rem, 10vw, 9rem);
+      color: var(--text);
+      letter-spacing: -0.015em;
+      font-variation-settings: 'opsz' 144, 'wght' 900;
+    }
+
+    .word-shredded {
+      font-size: clamp(2rem, 7.5vw, 7.5rem);
+      font-style: italic;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      font-variation-settings: 'opsz' 144, 'wght' 500;
+    }
+
+    /* ── COPY ── */
+    .hero-copy {
+      max-width: 560px;
+      margin-bottom: 3.5rem;
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 2.2vw, 1.3rem);
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+
+    .descriptor {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .descriptor em {
+      color: var(--text-mid);
+      font-style: normal;
+    }
+
+    /* ── EXPERIMENT STRIP ── */
+    .experiment-strip {
+      border-top: 1px solid var(--border);
+      padding-top: 1.6rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .log-stats {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+    .stat-value.pos { color: #6B9E5E; }
+    .stat-value.neg { color: var(--accent); }
+
+    .scroll-cue {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .arrow-anim {
+      font-size: 1rem;
+      animation: bob 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50%       { transform: translateY(5px); opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav-links { gap: 1.2rem; }
+      .nav-links li:not(:last-child):not(:nth-last-child(2)) { display: none; }
+      .hero { padding: 0 1.25rem; padding-top: 58px; }
+      .log-stats { gap: 1.5rem; }
+      .scroll-cue { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer"></div>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="wordmark">S<sup>3</sup></div>
+      <ul class="nav-links">
+        <li><a href="#">Log</a></li>
+        <li><a href="#">Training</a></li>
+        <li><a href="#">Nutrition</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#" class="nav-cta">Start Here →</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+
+    <div class="eyebrow">Self-experiment in progress &nbsp;·&nbsp; Vol. 01</div>
+
+    <h1 class="title-stack">
+      <span class="word word-smaller">Smaller</span>
+      <span class="word word-stronger">Stronger</span>
+      <span class="word word-shredded">Shredded</span>
+    </h1>
+
+    <div class="hero-copy">
+      <p class="tagline">One body. Relentless variables. No shortcuts.</p>
+      <p class="descriptor">
+        Training logs, hard lessons, and the <em>skill stacks that make life feel palpable</em> —
+        documented by a tree surgeon, coder, and dad
+        twenty years into the question.
+      </p>
+    </div>
+
+    <div class="experiment-strip">
+      <div class="log-stats">
+        <div class="stat">
+          <span class="stat-label">Current Phase</span>
+          <span class="stat-value">Cut · Wk 08</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Strength</span>
+          <span class="stat-value pos">↑ Trending</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Body Fat</span>
+          <span class="stat-value neg">↓ Dropping</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Log Entries</span>
+          <span class="stat-value">24</span>
+        </div>
+      </div>
+      <div class="scroll-cue">
+        Latest Entry
+        <span class="arrow-anim">↓</span>
+      </div>
+    </div>
+
+    <main style="display: flex; flex-direction: column; gap: 2.5rem; margin-top: 2.5rem; border-left: 1px solid #333; padding-left: 1.5rem; margin-left: 0.5rem;">
+        
+        {logs.length === 0 ? (
+          <p style="color: #666; font-style: italic;">No logs found. Ensure you have published documents inside Sanity Studio.</p>
+        ) : (
+          logs.map((log) => (
+            <article style="position: relative;">
+              
+              <div style="position: absolute; left: calc(-1.5rem - 5px); top: 8px; width: 9px; height: 9px; background: #222; border-radius: 50%;"></div>
+              
+              <h2 style="margin: 0 0 0.5rem 0; font-size: 1.35rem; font-weight: 700; line-height: 1.3;">
+                <a href={`/logs/${log.slug}`} style="color: #fff; text-decoration: none; transition: color 0.15s ease;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#fff'">
+                  Day {log.dayNumber}: {log.title}
+                </a>
+              </h2>
+              
+              <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.85rem; color: #b3b3b3; font-family: monospace; text-transform: uppercase; margin-bottom: 0.5rem;">
+                <span>{log.date}</span>
+                {log.weight && <span>• {log.weight}kg</span>}
+                {log.calories && <span>• {log.calories}kcal</span>}
+                {log.vibe && <span>• Vibe: {log.vibe}/10</span>}
+              </div>
+              
+              <a href={`/logs/${log.slug}`} style="font-size: 0.9rem; color: var(--accent); text-decoration: none; font-weight: 600;">
+                Read Entry →
+              </a>
+  
+            </article>
+          ))
+        )}
+  
+      </main>
+  </section>
+
+</body>
+</html>

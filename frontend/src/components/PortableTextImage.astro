@@ -1,0 +1,44 @@
+---
+import { buildSrc, buildSrcSet } from "@sanity-image/url-builder";
+
+const { node } = Astro.props;
+const imageId = node?.asset?._ref;
+
+// --- QUICK DEBUG LOGS ---
+console.log("DEBUG - Node Asset ID:", imageId);
+console.log("DEBUG - Project ID Env:", import.meta.env.PUBLIC_SANITY_PROJECT_ID);
+console.log("DEBUG - Dataset Env:", import.meta.env.PUBLIC_SANITY_DATASET);
+
+const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID;
+const dataset = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
+
+// CRITICAL: Explicitly pass baseUrl with a trailing slash!
+const options = imageId ? {
+  id: imageId,
+  width: 800,
+  baseUrl: `https://cdn.sanity.io/images/${projectId}/${dataset}/`,
+} : null;
+
+
+const finalSrc = options ? buildSrc(options).src : "";
+const finalSrcSet = options ? buildSrcSet(options) : "";
+---
+
+{imageId && (
+  <figure style="margin: 2.5rem 0; width: 100%;">
+    <img
+      src={finalSrc}
+      srcset={finalSrcSet}
+      sizes="(max-width: 800px) 100vw, 800px"
+      alt={node.alt || "Timeline entry documentation asset"}
+      loading="lazy"
+      decoding="async"
+      style="width: 100%; height: auto; border-radius: 4px; display: block;"
+    />
+    {node.caption && (
+      <figcaption style="color: #666; font-size: 0.85rem; text-align: center; margin-top: 0.6rem; font-style: italic;">
+        {node.caption}
+      </figcaption>
+    )}
+  </figure>
+)}

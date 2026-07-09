@@ -27,11 +27,21 @@ export default {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      options: { 
-        // Generates clean slugs like 'day-45-squat-pr'
-        source: (doc) => `day-${doc.dayNumber}-${doc.title.toLowerCase().replace(/\s+/g, '-')}` 
-      }
-    },
+      options: {
+        source: async (doc, options) => {
+          // 1. Ensure the reference exists
+          if (!doc.experiment?._ref) return `day-${doc.dayNumber}`;
+          
+          // 2. Fetch the target experiment title using the client in context
+          const { getClient } = options;
+          const client = getClient({ apiVersion: '2026-07-08' });
+          const experimentTitle = await client.fetch(`*[_id == $id][0].title`, { id: doc.experiment._ref });
+          
+          if (!experimentTitle) return `day-${doc.dayNumber}`;
+          
+          // 3. Return your beautifully formatted string rule
+          return `${experimentTitle.toLowerCase().replace(/\s+/g, '-')}-day-${doc.dayNumber}`;
+      }}},
     {
       name: 'experiment',
       title: 'Relates to Experiment Phase',
@@ -46,7 +56,11 @@ export default {
       name: 'content',
       title: 'Journal & Entry Body',
       type: 'array',
-      of: [{ type: 'block' }, { type: 'image' }, { type: 'knowledgeBomb' }]
+      of: [{ type: 'block' },
+         { type: 'image', options: {
+          hotspot: true
+      }},
+       { type: 'knowledgeBomb' }]
     }
   ]
 };
