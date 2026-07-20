@@ -1,0 +1,81 @@
+<nav>
+    <div class="nav-inner">
+      <div class="wordmark">S<sup>3</sup></div>
+      <ul class="nav-links">
+        <li><a href="#">Logs</a></li>
+        <li><a href="#">Lifestyle</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Resources</a></li>
+        <li><a href="#" class="nav-cta">Start Here →</a></li>
+      </ul>
+    </div>
+</nav>
+
+<style>
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 14, 9, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      user-select: none;
+    }
+    .wordmark sup {
+      color: var(--accent);
+      font-size: 0.75em;
+      vertical-align: super;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.18s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-links .nav-cta {
+      color: var(--accent);
+      border: 1px solid rgba(184,144,40,0.4);
+      padding: 0.38rem 1.1rem;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+      transition: background 0.18s, color 0.18s;
+    }
+    .nav-links .nav-cta:hover {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+</style>

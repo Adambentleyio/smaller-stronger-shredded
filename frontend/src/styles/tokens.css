@@ -1,0 +1,64 @@
+@layer tokens {
+  :root {
+    /* ── Colour ───────────────────────────────── */
+    --color-bg:             #0f0f0d;
+    --color-surface:        #1a1a17;
+    --color-surface-raised: #222220;
+    --color-border:         #2c2c29;
+    --color-border-subtle:  #1f1f1d;
+
+    --color-text:           #e8e4dc;
+    --color-text-muted:     #8a8780;
+    --color-text-faint:     #4a4a47;
+
+    /* amber — fits both editorial and fitness */
+    --color-accent:         #d4a843;
+    --color-accent-dim:     #a07e2a;
+
+    /* ── Typography ───────────────────────────── */
+    --font-sans:    'Space Grotesk', system-ui, sans-serif;
+    --font-serif:   'Fraunces', Georgia, serif;
+    --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+    /* fluid type scale */
+    --text-xs:   clamp(0.694rem, 0.68rem + 0.07vw,  0.75rem);
+    --text-sm:   clamp(0.833rem, 0.81rem + 0.11vw,  0.938rem);
+    --text-base: clamp(1rem,     0.97rem + 0.15vw,  1.125rem);
+    --text-lg:   clamp(1.2rem,   1.15rem + 0.25vw,  1.375rem);
+    --text-xl:   clamp(1.44rem,  1.36rem + 0.4vw,   1.75rem);
+    --text-2xl:  clamp(1.728rem, 1.6rem  + 0.64vw,  2.25rem);
+    --text-3xl:  clamp(2.074rem, 1.88rem + 0.97vw,  3rem);
+    --text-4xl:  clamp(2.488rem, 2.2rem  + 1.44vw,  4rem);
+
+    --leading-tight:  1.15;
+    --leading-snug:   1.35;
+    --leading-normal: 1.6;
+    --leading-loose:  1.8;
+
+    --tracking-tight: -0.03em;
+    --tracking-normal: 0em;
+    --tracking-wide:  0.06em;
+    --tracking-wider: 0.12em;
+
+    /* ── Layout ───────────────────────────────── */
+    --width-prose:  680px;
+    --width-wide:   1100px;
+
+    --space-1:  0.25rem;
+    --space-2:  0.5rem;
+    --space-3:  0.75rem;
+    --space-4:  1rem;
+    --space-6:  1.5rem;
+    --space-8:  2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-24: 6rem;
+
+    /* ── Misc ─────────────────────────────────── */
+    --radius-sm: 3px;
+    --radius:    6px;
+    --radius-lg: 12px;
+
+    --transition: 150ms ease;
+  }
+}
